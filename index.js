@@ -1,1 +1,1 @@
-module.expors = require('./fn/test');
+module.exports = require('./fn/test');
