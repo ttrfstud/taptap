@@ -66,4 +66,9 @@ function test(test) {
   setTimeout(run, 0, pbox);
 }
 
+test.pipe = function (stream) {
+  out = stream;
+  return out;
+};
+
 module.exports = test;
