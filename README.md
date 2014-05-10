@@ -28,7 +28,7 @@ taptap writes to stdout but you could give it another stream to write to if you 
 var test = require('taptap');
 var stream = require('stream').Transform;
 
-test.pipe(new stream());
+test.pipe(new stream).pipe(new stream);
 
 [your tests...]
 ```
