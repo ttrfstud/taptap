@@ -4,6 +4,7 @@ taptap is simple testing function. you give a test function with "done" param. l
 
 ```javascript
 var test = require('taptap');
+var assert = require('assert');
 
 test(function (done) {
   assert(1);
