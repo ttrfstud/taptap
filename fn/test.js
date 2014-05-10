@@ -10,6 +10,10 @@ out = process.stdout;
 
 process.on('exit', exit);
 
+function depad(test) {
+  return test.toString().replace(/^/gmi, ' ')
+}
+
 function exit() {
   out.write('1..');
   out.write(String(c));
@@ -19,7 +23,12 @@ function exit() {
 function ok(pbox) {
   clearTimeout(pbox.notokid);
   if (pbox.ok) {
-    out.write('ok\n');
+    out.write('ok');
+    if (pbox.todo) {
+      out.write(' #TODO :\n');
+      out.write(depad(pbox.test));
+    }
+    out.write('\n');
     c++;
   }
   return;
@@ -40,26 +49,33 @@ function notok(pbox) {
 
   out.write('not ok ');
 
-  if (pbox.stack) {
+  if (pbox.todo) {
+    out.write('#TODO :\n');
+    out.write(depad(pbox.test));
+  } else if (pbox.stack) {
     out.write(String(pbox.stack));
   } else {
     out.write('hanger:\n');
-    out.write(pbox.test.toString().replace(/^/gmi, ' '));
+    out.write(depad(pbox.test));
   }
 
   out.write('\n');
   c++;
-  process.exit();
+
+  if (!pbox.todo) {
+    process.exit();
+  }
 }
 
-function test(test) {
+function test(test, todo) {
   var pbox;
 
   pbox = {
     ok: 1,
     notokid: 0,
     test: test,
-    stack: null
+    stack: null,
+    todo: todo
   };
 
   pbox.notokid = setTimeout(notok, TIMEOUT, pbox);
@@ -69,6 +85,17 @@ function test(test) {
 test.pipe = function (stream) {
   out = stream;
   return out;
+};
+
+test.skip = function (test) {
+  out.write('ok #SKIP :\n');
+  out.write(depad(test));
+  out.write('\n')
+  c++;
+};
+
+test.todo = function (fn) {
+  test(fn, true);
 };
 
 module.exports = test;
