@@ -34,4 +34,19 @@ test.pipe(new stream).pipe(new stream);
 [your tests...]
 ```
 
+you could also .skip and .todo tests. like this:
+
+```javascript
+var test = require('taptap');
+
+test.skip(function () {
+});
+
+test.todo(function () {
+  throw new Error;
+});
+```
+
+skip tests are always "ok", todo tests may be either "not ok" (if they don't pass) or "ok" if they pass (gives bonus!).
+
 please check that your test functions are indeed functions!
