@@ -22,4 +22,15 @@ there may be two reasons when test failed:
 
 in these cases taptap will output stacktrace for the first case and "hanger" test function source code in the second case.
 
+taptap writes to stdout but you could give you another stream to write to if you want. call .pipe on it, like this
+
+```javascript
+var test = require('taptap');
+var stream = require('stream').Transform;
+
+test.pipe(new stream());
+
+[your tests...]
+```
+
 please check that your test functions are indeed functions!
