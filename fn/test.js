@@ -16,33 +16,35 @@ function exit() {
   out.write('\n');
 }
 
-function ok(pbox, test) {
-  if (arguments.length == 1) {
-    clearTimeout(pbox.id);
-    if (!pbox.notok) {
-      out.write('ok\n');
-      c++;
-    }
-    return;
+function ok(pbox) {
+  clearTimeout(pbox.notokid);
+  if (pbox.ok) {
+    out.write('ok\n');
+    c++;
   }
+  return;
+}
 
+function run(pbox, test) {
   try {
-    test(ok.bind(null, pbox));
+    pbox.test(ok.bind(null, pbox));
   } catch (e) {
-    notok(pbox, e.stack);
+    pbox.stack = e.stack.replace(/^\s+/gmi, ' ');
+    notok(pbox);
   }
 }
 
-function notok(pbox, stack) {
-  clearTimeout(pbox.id);
+function notok(pbox) {
+  clearTimeout(pbox.notokid);
   pbox.ok = false;
 
   out.write('not ok ');
-  
-  if (stack) {
-    out.write(String(stack));
+
+  if (pbox.stack) {
+    out.write(String(pbox.stack));
   } else {
-    out.write('hanger!');
+    out.write('hanger:\n');
+    out.write(pbox.test.toString().replace(/^/gmi, ' '));
   }
 
   out.write('\n');
@@ -52,15 +54,16 @@ function notok(pbox, stack) {
 
 function test(test) {
   var pbox;
-  var notokid;
 
   pbox = {
     ok: 1,
-    id: 0
+    notokid: 0,
+    test: test,
+    stack: null
   };
 
-  pbox.id = setTimeout(notok, TIMEOUT, pbox);
-  setTimeout(ok, 0, pbox, test);
+  pbox.notokid = setTimeout(notok, TIMEOUT, pbox);
+  setTimeout(run, 0, pbox);
 }
 
 module.exports = test;
